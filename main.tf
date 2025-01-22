@@ -6,7 +6,9 @@ module "vpc" {
     cidr = "10.0.0.0/16"
 
 
-    azs             = ["us-east-1d", "us-east-1e", "us-east-1f"]
+
+    #azs             = ["us-east-1d", "us-east-1e", "us-east-1f"]
+    azs             = data.aws_availability_zones.available.names
     private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
     public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
     #enable_nat_gateway   = true
@@ -19,6 +21,19 @@ module "vpc" {
     }
 }
 
+data "aws_availability_zones" "available" {
+    state = "available"
+
+    filter {
+      name = "zone-type"
+      values = ["availability-zone"]
+    }
+}
+
 output "nat_gateway_ids" {
     value = module.vpc.natgw_ids
+}
+
+output "aws_availability_zones" {
+    value = data.aws_availability_zones.available.names
 }
